@@ -1,4 +1,4 @@
-### Vpc Module Creation
+### VPC Module Creation
 
 ```mkdir -p /var/terraform/modules/vpc```
 
