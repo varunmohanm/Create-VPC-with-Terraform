@@ -370,6 +370,8 @@ variable "project_env" {
 
 ### Now we can create a VPC calling the modules which we just created under
 ```/var/terraform/modules/vpc/ ```
+In the below example, we are provisioning three EC2 instances for webserver, db server and bastion server under this VPC. The respective security groups are also created with this.
+
 ## main.tf
 
 #### Calling Module
