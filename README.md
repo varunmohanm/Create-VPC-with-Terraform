@@ -339,7 +339,7 @@ output "subnet_private3_id" {
 
 ### Creating Instances 
 
-```mkdir zomato-project```
+```mkdir project-folder```
 ```cd project-folder/```
 
 
@@ -640,8 +640,8 @@ resource "aws_key_pair"  "terraform" {
 
 ### terraform init
 
-[root@ip-172-31-42-108 zomato-project]# vim /var/terraform/modules/vpc/main.tf 
-[root@ip-172-31-42-108 zomato-project]# ``` terraform init ``` 
+[root@ip-172-31-42-108 project-folder]# vim /var/terraform/modules/vpc/main.tf 
+[root@ip-172-31-42-108 project-folder]# ``` terraform init ``` 
 ```
 Initializing modules...
 
@@ -668,7 +668,7 @@ rerun this command to reinitialize your working directory. If you forget, other
 commands will detect it and remind you to do so if necessary.
 ```
 
-[root@ip-172-31-42-108 zomato-project]# ``` tree -A -a ```
+[root@ip-172-31-42-108 project-folder]# ``` tree -A -a ```
 .
 ```
 ├── main.tf
@@ -692,7 +692,7 @@ commands will detect it and remind you to do so if necessary.
 ```
 
 ### Validate the terraform code 
-[root@ip-172-31-42-108 zomato-project]# ``` terraform validate ```
+[root@ip-172-31-42-108 project-folder]# ``` terraform validate ```
 Success! The configuration is valid.
 
 ### terraform plan
@@ -716,11 +716,4 @@ bastion_public_ip = "3.110.154.158"
 database_private_ip = "172.20.100.54"
 webserver_private_ip = "172.20.25.134"
 webserver_public_ip = "65.1.109.22"
-
- 
- 
-
-
-
-
 
