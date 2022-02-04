@@ -1,3 +1,13 @@
+#### What is Amazon VPC?
+
+##### Amazon Virtual Private Cloud (Amazon VPC) enables you to launch AWS resources into a virtual network that you've defined. This virtual network closely resembles a traditional network that you'd operate in your own data center, with the benefits of using the scalable infrastructure of AWS.
+
+
+#### What is Terraform?
+
+##### HashiCorp Terraform is an infrastructure as code tool that lets you define both cloud and on-prem resources in human-readable configuration files that you can version, reuse, and share. You can then use a consistent workflow to provision and manage all of your infrastructure throughout its lifecycle. Terraform can manage low-level components like compute, storage, and networking resources, as well as high-level components like DNS entries and SaaS features.
+
+
 ### VPC Module Creation
 
 ```mkdir -p /var/terraform/modules/vpc```
@@ -370,7 +380,6 @@ variable "project_env" {
 
 ### Now we can create a VPC calling the modules which we just created under
 ```/var/terraform/modules/vpc/ ```
-
 ##### In the below example, we are provisioning three EC2 instances for webserver, db server and bastion server under this VPC. The respective security groups will be created in the below steps.
 
 ## main.tf
