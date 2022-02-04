@@ -1,8 +1,4 @@
-# Create-VPC-with-Terraform
-Provisioning a vpc with terraform
-
-
-### Vpc Module Creation
+### VPC Module Creation
 
 ```mkdir -p /var/terraform/modules/vpc```
 
@@ -308,6 +304,40 @@ resource "aws_route_table_association" "private3" {
 }
 ```
 
+### output.tf
+
+```
+output "vpc_id" {
+  value = aws_vpc.vpc.id
+}
+
+output "subnet_public1_id" {
+  value = aws_subnet.public1.id
+}
+
+output "subnet_public2_id" {
+  value = aws_subnet.public2.id
+}
+
+output "subnet_public3_id" {
+  value = aws_subnet.public3.id
+}
+
+
+output "subnet_private1_id" {
+  value = aws_subnet.private1.id
+}
+
+output "subnet_private2_id" {
+  value = aws_subnet.private2.id
+}
+
+output "subnet_private3_id" {
+  value = aws_subnet.private3.id
+}
+```
+
+
 
 ### terraform init
 
@@ -390,7 +420,6 @@ webserver_public_ip = "65.1.109.22"
 
  
  
-
 
 
 
