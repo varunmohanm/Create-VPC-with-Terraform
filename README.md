@@ -194,7 +194,7 @@ tags = {
 }
 ```
 
-### **ElasticIp for NatGateway**
+### **ElasticIP for NatGateway**
 
 ```
 resource "aws_eip" "nat"  {
@@ -367,6 +367,9 @@ variable "project_env" {
   default = "dev"
 }
 ```
+
+### Now we can create a VPC calling the modules which we just created under
+```/var/terraform/modules/vpc/ ```
 ## main.tf
 
 #### Calling Module
@@ -640,7 +643,8 @@ resource "aws_key_pair"  "terraform" {
 
 ### terraform init
 
-[root@ip-172-31-42-108 project-folder]# vim /var/terraform/modules/vpc/main.tf 
+[root@ip-172-31-42-108 project-folder]# ```vim /var/terraform/modules/vpc/main.tf```
+
 [root@ip-172-31-42-108 project-folder]# ``` terraform init ``` 
 ```
 Initializing modules...
