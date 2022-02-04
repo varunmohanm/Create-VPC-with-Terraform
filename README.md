@@ -1,4 +1,4 @@
-### VPC Module Creation
+### Vpc Module Creation
 
 ```mkdir -p /var/terraform/modules/vpc```
 
@@ -336,6 +336,305 @@ output "subnet_private3_id" {
   value = aws_subnet.private3.id
 }
 ```
+
+### Creating Instances 
+
+```mkdir zomato-project```
+```cd project-folder/```
+
+
+
+### provider.tf
+```
+provider "aws" {
+  region = "ap-south-1"
+}
+```
+
+
+### variables.tf
+
+```
+variable "project_vpc_cidr" {
+  default = "172.24.0.0/16"
+}
+
+variable "project_name" {
+  default = "zomato"
+}
+
+variable "project_env" {
+  default = "dev"
+}
+```
+## main.tf
+
+#### Calling Module
+
+```
+module "vpc" {
+    
+  source   = "/var/terraform/modules/vpc/"
+  vpc_cidr = var.project_vpc_cidr
+  project  = var.project_name
+  env      = var.project_env
+  
+}
+```
+
+
+### Creating SecurityGroup bastion
+
+```
+resource "aws_security_group" "bastion" {
+    
+  name        = "${var.project_name}-bastion-${var.project_env}"
+  description = "allow 22 traffic"
+  vpc_id      = module.vpc.vpc_id
+
+
+  ingress {
+    description      = ""
+    from_port        = 22
+    to_port          = 22
+    protocol         = "tcp"
+    cidr_blocks      = [ "0.0.0.0/0" ]
+    ipv6_cidr_blocks = [ "::/0" ]
+  }
+    
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
+    Name = "${var.project_name}-bastion-${var.project_env}"
+    project = var.project_name
+     environment = var.project_env
+  }
+}
+```
+
+### Creating SecurityGroup webserver
+```
+resource "aws_security_group" "webserver" {
+    
+  name        = "${var.project_name}-webserver-${var.project_env}"
+  description = "allow 80,443 traffic"
+  vpc_id      = module.vpc.vpc_id
+
+
+  ingress {
+    description      = ""
+    from_port        = 80
+    to_port          = 80
+    protocol         = "tcp"
+    cidr_blocks      = [ "0.0.0.0/0" ]
+    ipv6_cidr_blocks = [ "::/0" ]
+  }
+    
+   ingress {
+    description      = ""
+    from_port        = 443
+    to_port          = 443
+    protocol         = "tcp"
+    cidr_blocks      = [ "0.0.0.0/0" ]
+    ipv6_cidr_blocks = [ "::/0" ]
+  }
+   
+  ingress {
+    description      = ""
+    from_port        = 22
+    to_port          = 22
+    protocol         = "tcp"
+    security_groups  = [ aws_security_group.bastion.id ]
+  }
+    
+    
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
+    Name = "${var.project_name}-webserver-${var.project_env}"
+    project = var.project_name
+     environment = var.project_env
+  }
+}
+```
+
+### Creating SecurityGroup database
+
+```
+resource "aws_security_group" "database" {
+    
+  name        = "${var.project_name}-database-${var.project_env}"
+  description = "allow 3306 traffic"
+  vpc_id      = module.vpc.vpc_id
+
+   ingress {
+    description      = ""
+    from_port        = 3306
+    to_port          = 3306
+    protocol         = "tcp"
+    security_groups  = [ aws_security_group.webserver.id ]
+  }
+   
+  ingress {
+    description      = ""
+    from_port        = 22
+    to_port          = 22
+    protocol         = "tcp"
+    security_groups  = [ aws_security_group.bastion.id ]
+  }
+    
+    
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
+    Name = "${var.project_name}-database-${var.project_env}"
+    project = var.project_name
+     environment = var.project_env
+  }
+}
+```
+
+
+#### Creating Bastion Instance
+
+```
+resource "aws_instance" "bastion" {
+    
+  ami           = "ami-03fa4afc89e4a8a09"
+  instance_type = "t2.micro"
+  key_name      = "mumbai-aws-new" 
+  vpc_security_group_ids = [ aws_security_group.bastion.id ]
+  subnet_id = module.vpc.subnet_public2_id
+  user_data = file("setup.sh")
+  tags = {
+    Name = "${var.project_name}-bastion-${var.project_env}"
+    project = var.project_name
+     environment = var.project_env
+  }
+}
+```
+
+#### Creating webserver Instance
+
+```
+resource "aws_instance" "webserver" {
+    
+  ami           = "ami-03fa4afc89e4a8a09"
+  instance_type = "t2.micro"
+  key_name      = "mumbai-aws-new" 
+  vpc_security_group_ids = [ aws_security_group.webserver.id ]
+  subnet_id = module.vpc.subnet_public1_id
+  user_data = file("setup.sh")
+  tags = {
+    Name = "${var.project_name}-webserver-${var.project_env}"
+    project = var.project_name
+     environment = var.project_env
+  }
+}
+```
+
+### Creating database Instance
+
+```
+resource "aws_instance" "database" {
+    
+  ami           = "ami-03fa4afc89e4a8a09"
+  instance_type = "t2.micro"
+  key_name      = "mumbai-aws-new" 
+  vpc_security_group_ids = [ aws_security_group.database.id ]
+  subnet_id = module.vpc.subnet_private1_id
+  user_data = file("setup.sh")
+  tags = {
+    Name = "${var.project_name}-database-${var.project_env}"
+    project = var.project_name
+     environment = var.project_env
+  }
+}
+```
+
+#### output.tf
+
+```
+output "bastion_public_ip" {
+    
+   value = aws_instance.bastion.public_ip    
+}
+
+output "webserver_public_ip" {
+   value = aws_instance.webserver.public_ip  
+    
+}
+
+output "webserver_private_ip" {
+   value = aws_instance.webserver.private_ip  
+    
+}
+
+output "database_private_ip" {
+  value = aws_instance.database.private_ip    
+    
+}
+```
+
+[root@ip-172-31-42-108 project-folder]# ```ls -l```
+
+-rw-r--r-- 1 root root  5269 Feb  4 16:15 main.tf
+-rw-r--r-- 1 root root   340 Feb  4 16:16 output.tf
+-rw-r--r-- 1 root root    43 Feb  4 15:51 provider.tf
+-rw-r--r-- 1 root root   161 Feb  4 15:55 variables.tf
+
+### Userdata
+#### setup.sh
+
+```
+#!/bin/bash
+
+
+echo "ClientAliveInterval 60" >> /etc/ssh/sshd_config
+echo "LANG=en_US.utf-8" >> /etc/environment
+echo "LC_ALL=en_US.utf-8" >> /etc/environment
+
+echo "password@123" | passwd root --stdin
+sed  -i 's/#PermitRootLogin yes/PermitRootLogin yes/' /etc/ssh/sshd_config
+sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+service sshd restart
+```
+
+### Keypair creation
+Create an ssh keypair with ```ssh-keygen``` command. Save the key with a name. [I've used the name **terraform**]
+
+Create keypair.tf file 
+```
+resource "aws_key_pair"  "terraform" {
+
+  key_name = "terraform"
+  public_key = file("terraform.pub")
+  tags = {
+    Name = "terraform"
+  }
+}
+
+```
+
+
 
 
 
