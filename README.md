@@ -4,7 +4,6 @@
 
 
 #### What is Terraform?
-
 ##### HashiCorp Terraform is an infrastructure as code tool that lets you define both cloud and on-prem resources in human-readable configuration files that you can version, reuse, and share. You can then use a consistent workflow to provision and manage all of your infrastructure throughout its lifecycle. Terraform can manage low-level components like compute, storage, and networking resources, as well as high-level components like DNS entries and SaaS features.
 
 
@@ -35,7 +34,7 @@
 ### variables.tf
 ```vim /var/terraform/modules/vpc/variables.tf```
 
-
+```
 variable "vpc_cidr" {
     default = "172.16.0.0/16"
 }
@@ -47,13 +46,16 @@ variable "project" {
 variable "env" {
   default = "test"
 }
+```
 
 ### datasource.tf
 ```vim /var/terraform/modules/vpc/datasource.tf```
 
+```
 data "aws_availability_zones" "az" {
   state = "available"
 }
+```
 
 ### main.tf
 
